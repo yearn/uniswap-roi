@@ -588,7 +588,7 @@ contract UniswapAPR is Ownable {
       uint256 roiFrom = block.number.sub(createdAt);
       uint256 baseAPR = roi.mul(1e15).mul(blocksPerYear).div(roiFrom);
       uint256 adjusted = blocksPerYear.mul(1e18).div(roiFrom);
-      return baseAPR.sub(adjusted);
+      return baseAPR.add(1e18).sub(adjusted);
     }
 
     function calcUniswapAPR(address token, uint256 createdAt) public view returns (uint256) {
@@ -598,7 +598,7 @@ contract UniswapAPR is Ownable {
       uint256 roiFrom = block.number.sub(createdAt);
       uint256 baseAPR = roi.mul(1e15).mul(blocksPerYear).div(roiFrom);
       uint256 adjusted = blocksPerYear.mul(1e18).div(roiFrom);
-      return baseAPR.sub(adjusted);
+      return baseAPR.add(1e18).sub(adjusted);
     }
 
     // incase of half-way error
