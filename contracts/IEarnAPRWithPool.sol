@@ -498,7 +498,7 @@ contract IEarnAPRWithPool is Ownable {
       address yToken = yTokens[_token];
       uint256 _supply = 0;
       if (yToken != address(0)) {
-        _supply = IYToken(_token).calcPoolValueInToken();
+        _supply = IYToken(yToken).calcPoolValueInToken();
       }
       return getAPROptionsAdjusted(_token, _supply);
     }
@@ -525,7 +525,8 @@ contract IEarnAPRWithPool is Ownable {
       dapr = dydx[_token];
 
       if (cToken != address(0)) {
-        capr = APRWithPoolOracle(APR).getCompoundAPRAdjusted(cToken, _supply);
+        // Really nasty hack because USDC interestRateModel doesn't have supplyRate
+        capr = APRWithPoolOracle(APR).getCompoundAPR(cToken);
         created = pools[cToken];
         if (created > 0) {
           unicapr = IUniswapAPR(UNIAPR).calcUniswapAPR(cToken, created);
