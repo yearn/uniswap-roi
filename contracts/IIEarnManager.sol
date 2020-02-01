@@ -1,89 +1,90 @@
 interface IIEarnManager {
-    function recommendSNX() public view returns (
+
+    function recommendSNX() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendUSDT() public view returns (
+    function recommendUSDT() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendBAT() public view returns (
+    function recommendBAT() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendMKR() public view returns (
+    function recommendMKR() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendZRX() public view returns (
+    function recommendZRX() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendREP() public view returns (
+    function recommendREP() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendKNC() public view returns (
+    function recommendKNC() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendWBTC() public view returns (
+    function recommendWBTC() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendLINK() public view returns (
+    function recommendLINK() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendSUSD() public view returns (
+    function recommendSUSD() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendDAI() public view returns (
+    function recommendDAI() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendETH() public view returns (
+    function recommendETH() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
       uint256 aapr,
       uint256 dapr
     );
-    function recommendUSDC() public view returns (
+    function recommendUSDC() external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
@@ -91,7 +92,7 @@ interface IIEarnManager {
       uint256 dapr
     );
 
-    function recommend(address _token) public view returns (
+    function recommend(address _token) external view returns (
       string memory choice,
       uint256 capr,
       uint256 iapr,
