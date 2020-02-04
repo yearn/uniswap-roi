@@ -362,6 +362,10 @@ contract IUniswapAPR {
 
 interface APRWithPoolOracle {
 
+  function getDDEXAPR(address token) external view returns (uint256);
+  function getDDEXAPRAdjusted(address token, uint256 _supply) external view returns (uint256);
+  function getLENDFAPR(address token) external view returns (uint256);
+  function getLENDFAPRAdjusted(address token, uint256 _supply) external view returns (uint256);
   function getCompoundAPR(address token) external view returns (uint256);
   function getCompoundAPRAdjusted(address token, uint256 _supply) external view returns (uint256);
   function getFulcrumAPR(address token) external view returns(uint256);
@@ -380,6 +384,7 @@ interface IUniswapFactory {
 
 interface IYToken {
   function calcPoolValueInToken() external view returns (uint256);
+  function decimals() external view returns (uint256);
 }
 
 
@@ -404,7 +409,7 @@ contract IEarnAPRWithPool is Ownable {
         UNI = address(0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95);
         UNIROI = address(0xD04cA0Ae1cd8085438FDd8c22A76246F315c2687);
         UNIAPR = address(0x4c70D89A4681b2151F56Dc2c3FD751aBb9CE3D95);
-        APR = address(0xDAe803688cbaa5eB0EA17e1332569F0C235f5A54);
+        APR = address(0xe233b89c76C172E36Fe6985fE8B2731522Fc6177);
 
         addPool(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643, 9000629);
         addPool(0xF5DCe57282A584D2746FaF1593d3121Fcac444dC, 7723867);
@@ -482,18 +487,21 @@ contract IEarnAPRWithPool is Ownable {
         addYToken(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA); // yUSDC
         addYToken(0xdAC17F958D2ee523a2206206994597C13D831ec7, 0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14); // yUSDT
         addYToken(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51, 0x36324b8168f960A12a8fD01406C9C78143d41380); // ySUSD
+        addYToken(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, 0x04EF8121aD039ff41d10029c91EA1694432514e9); // yWBTC
 
     }
 
-    function getAPROptions(address _token) public view returns (
-      uint256 uniapr,
-      uint256 capr,
-      uint256 unicapr,
-      uint256 iapr,
-      uint256 uniiapr,
-      uint256 aapr,
-      uint256 uniaapr,
-      uint256 dapr
+    function getAPROptionsInc(address _token) public view returns (
+      uint256 _uniswap,
+      uint256 _compound,
+      uint256 _unicompound,
+      uint256 _fulcrum,
+      uint256 _unifulcrum,
+      uint256 _aave,
+      uint256 _uniaave,
+      uint256 _dydx,
+      uint256 _ddex,
+      uint256 _lendf
     ) {
       address yToken = yTokens[_token];
       uint256 _supply = 0;
@@ -503,63 +511,83 @@ contract IEarnAPRWithPool is Ownable {
       return getAPROptionsAdjusted(_token, _supply);
     }
 
+    function getAPROptions(address _token) public view returns (
+      uint256 _uniswap,
+      uint256 _compound,
+      uint256 _unicompound,
+      uint256 _fulcrum,
+      uint256 _unifulcrum,
+      uint256 _aave,
+      uint256 _uniaave,
+      uint256 _dydx,
+      uint256 _ddex,
+      uint256 _lendf
+    ) {
+      return getAPROptionsAdjusted(_token, 0);
+    }
+
     function getAPROptionsAdjusted(address _token, uint256 _supply) public view returns (
-      uint256 uniapr,
-      uint256 capr,
-      uint256 unicapr,
-      uint256 iapr,
-      uint256 uniiapr,
-      uint256 aapr,
-      uint256 uniaapr,
-      uint256 dapr
+      uint256 _uniswap,
+      uint256 _compound,
+      uint256 _unicompound,
+      uint256 _fulcrum,
+      uint256 _unifulcrum,
+      uint256 _aave,
+      uint256 _uniaave,
+      uint256 _dydx,
+      uint256 _ddex,
+      uint256 _lendf
     ) {
       uint256 created = pools[_token];
 
       if (created > 0) {
-        uniapr = IUniswapAPR(UNIAPR).calcUniswapAPR(_token, created);
+        _uniswap = IUniswapAPR(UNIAPR).calcUniswapAPR(_token, created);
       }
-      address cToken = compound[_token];
-      address iToken = fulcrum[_token];
-      address aToken = aave[_token];
-      // Really nasty hack because stack is too deep
-      dapr = dydx[_token];
+      address addr = compound[_token];
+      if (addr != address(0)) {
+        _compound = APRWithPoolOracle(APR).getCompoundAPR(addr);
+        created = pools[addr];
+        if (created > 0) {
+          _unicompound = IUniswapAPR(UNIAPR).calcUniswapAPR(addr, created);
+        }
+      }
+      addr = fulcrum[_token];
+      if (addr != address(0)) {
+        _fulcrum = APRWithPoolOracle(APR).getFulcrumAPRAdjusted(addr, _supply);
+        created = pools[addr];
+        if (created > 0) {
+          _unifulcrum = IUniswapAPR(UNIAPR).calcUniswapAPR(addr, created);
+        }
+      }
+      addr = aave[_token];
+      if (addr != address(0)) {
+        _aave = APRWithPoolOracle(APR).getAaveAPRAdjusted(addr, _supply);
+        addr = aaveUni[_token];
+        created = pools[addr];
+        if (created > 0) {
+          _uniaave = IUniswapAPR(UNIAPR).calcUniswapAPR(addr, created);
+        }
+      }
 
-      if (cToken != address(0)) {
-        // Really nasty hack because USDC interestRateModel doesn't have supplyRate
-        capr = APRWithPoolOracle(APR).getCompoundAPR(cToken);
-        created = pools[cToken];
-        if (created > 0) {
-          unicapr = IUniswapAPR(UNIAPR).calcUniswapAPR(cToken, created);
-        }
+      _dydx = dydx[_token];
+      if (_dydx > 0 || _token == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) {
+        _dydx = APRWithPoolOracle(APR).getDyDxAPRAdjusted(_dydx, _supply);
       }
-      if (iToken != address(0)) {
-        iapr = APRWithPoolOracle(APR).getFulcrumAPRAdjusted(iToken, _supply);
-        created = pools[iToken];
-        if (created > 0) {
-          uniiapr = IUniswapAPR(UNIAPR).calcUniswapAPR(iToken, created);
-        }
-      }
-      if (aToken != address(0)) {
-        aapr = APRWithPoolOracle(APR).getAaveAPRAdjusted(aToken, _supply);
-        aToken = aaveUni[_token];
-        created = pools[aToken];
-        if (created > 0) {
-          uniaapr = IUniswapAPR(UNIAPR).calcUniswapAPR(aToken, created);
-        }
-      }
-      if (dapr > 0 || _token == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) {
-        dapr = APRWithPoolOracle(APR).getDyDxAPRAdjusted(dapr, _supply);
-      }
+
+      _ddex = APRWithPoolOracle(APR).getDDEXAPRAdjusted(_token, _supply);
+      _lendf = APRWithPoolOracle(APR).getLENDFAPRAdjusted(_token, _supply);
 
       return (
-        uniapr,
-        capr,
-        unicapr,
-        iapr,
-        uniiapr,
-        aapr,
-        uniaapr,
-        dapr
+        _uniswap,
+        _compound,
+        _unicompound,
+        _fulcrum,
+        _unifulcrum,
+        _aave,
+        _uniaave,
+        _dydx,
+        _ddex,
+        _lendf
       );
     }
 
