@@ -399,6 +399,7 @@ contract IEarnAPRWithPool is Ownable {
     mapping(address => address) public aaveUni;
     mapping(address => uint256) public dydx;
     mapping(address => address) public yTokens;
+    mapping(address => uint256) public yearns;
 
     address public UNI;
     address public UNIROI;
@@ -488,6 +489,12 @@ contract IEarnAPRWithPool is Ownable {
         addYToken(0xdAC17F958D2ee523a2206206994597C13D831ec7, 0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14); // yUSDT
         addYToken(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51, 0x36324b8168f960A12a8fD01406C9C78143d41380); // ySUSD
         addYToken(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, 0x04EF8121aD039ff41d10029c91EA1694432514e9); // yWBTC
+
+        /*addYearn(0x9D25057e62939D3408406975aD75Ffe834DA4cDd,9381203); //yDAI
+        addYearn(0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA,9381851); //yUSDC
+        addYearn(0x36324b8168f960A12a8fD01406C9C78143d41380,9387937); //ySUSD
+        addYearn(0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14,9384129); //yUSDT
+        addYearn(0x04EF8121aD039ff41d10029c91EA1694432514e9,9396412); //yWBTC*/
 
     }
 
