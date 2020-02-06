@@ -399,7 +399,6 @@ contract IEarnAPRWithPool is Ownable {
     mapping(address => address) public aaveUni;
     mapping(address => uint256) public dydx;
     mapping(address => address) public yTokens;
-    mapping(address => uint256) public yearns;
 
     address public UNI;
     address public UNIROI;
@@ -410,7 +409,7 @@ contract IEarnAPRWithPool is Ownable {
         UNI = address(0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95);
         UNIROI = address(0xD04cA0Ae1cd8085438FDd8c22A76246F315c2687);
         UNIAPR = address(0x4c70D89A4681b2151F56Dc2c3FD751aBb9CE3D95);
-        APR = address(0xe233b89c76C172E36Fe6985fE8B2731522Fc6177);
+        APR = address(0xeC3aDd301dcAC0e9B0B880FCf6F92BDfdc002BBc);
 
         addPool(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643, 9000629);
         addPool(0xF5DCe57282A584D2746FaF1593d3121Fcac444dC, 7723867);
@@ -490,12 +489,18 @@ contract IEarnAPRWithPool is Ownable {
         addYToken(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51, 0x36324b8168f960A12a8fD01406C9C78143d41380); // ySUSD
         addYToken(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, 0x04EF8121aD039ff41d10029c91EA1694432514e9); // yWBTC
 
-        /*addYearn(0x9D25057e62939D3408406975aD75Ffe834DA4cDd,9381203); //yDAI
-        addYearn(0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA,9381851); //yUSDC
-        addYearn(0x36324b8168f960A12a8fD01406C9C78143d41380,9387937); //ySUSD
-        addYearn(0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14,9384129); //yUSDT
-        addYearn(0x04EF8121aD039ff41d10029c91EA1694432514e9,9396412); //yWBTC*/
+    }
 
+    // Wrapper for legacy v1 token support
+    function recommend(address _token) public view returns (
+      string memory choice,
+      uint256 capr,
+      uint256 iapr,
+      uint256 aapr,
+      uint256 dapr
+    ) {
+      ( , capr, , iapr, , aapr, , dapr, , ) = getAPROptionsInc(_token);
+      return (choice, capr, iapr, aapr, dapr);
     }
 
     function getAPROptionsInc(address _token) public view returns (
